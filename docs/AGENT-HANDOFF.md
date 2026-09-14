@@ -56,7 +56,7 @@ See [CHANGELOG-PHASES.md](CHANGELOG-PHASES.md) and [phases/](phases/).
 
 - **Now:** Preview preparation complete (ADR-0017). **Do not** `nuget push` / tag / GitHub Release without explicit approval.
 - **Next:** Owner-approved publish of `0.1.0-preview.1` to NuGet.org (and optional prefix reservation after).
-- Push local `master` to GitHub when owner directs.
+- Push local `main` to GitHub when owner directs.
 
 ## Critical Architecture Decisions (selected)
 
