@@ -23,7 +23,29 @@ Make Permixa technically and publicly ready for `0.1.0-preview.1` without publis
 | SourceLink + repository metadata | Directory.Build.props |
 | Validation CI | `.github/workflows/ci.yml` (no publish) |
 | ADR | [ADR-0017](../decisions/ADR-0017-public-preview-packaging.md) |
+| Dry-run pack | Six `.nupkg` + six `.snupkg` in `artifacts/local-feed/` |
+| PackageReference consumers | Core / Redis / Resend validated then **deleted** |
+| Vulnerability scan | No runtime vulnerable packages; SourceLink build-time `Microsoft.Build.Tasks.Git` 8.0.0 Moderate (PrivateAssets) |
+| PackageId availability | All six **AVAILABLE** on nuget.org (404) |
+
+## Dry-run regression
+
+```text
+Domain                36
+Application          224
+Infrastructure       171
+AspNetCore            52
+Caching.Redis         17
+Email.Resend           5
+Integration           51
+Total                556 / 556
+
+Build: 0 errors, 0 warnings
+Skipped: 0
+```
 
 ## Publication
 
-**Not published.** Classification after dry-run: see CURRENT-STATE / final report.
+**Not published.**
+
+**Classification:** Public-preview ready pending explicit publish approval.

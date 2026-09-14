@@ -12,23 +12,25 @@ It builds **on top of ASP.NET Core Identity** and adds permissions, overrides, r
 **Previous internal name:** Foundation (Phase I-1 / ADR-0014). Do not reintroduce Foundation product branding.
 
 Solution: `Permixa.slnx`  
-Primary NuGet package: `Permixa.AspNetCore` @ `0.1.0-preview.1` (local only)  
-Optional providers: `Permixa.Caching.Redis`, `Permixa.Email.Resend`
+Primary NuGet package: `Permixa.AspNetCore` @ `0.1.0-preview.1`  
+Optional providers: `Permixa.Caching.Redis`, `Permixa.Email.Resend`  
+Canonical repo: https://github.com/AbdulHaDi-Darwish-Dev/Permixa  
+License: **Apache-2.0**
 
 ## Current Status
 
 | Item | State |
 |------|--------|
-| Last completed phase | **Phase I-3 — Optional Redis & Resend provider package split** |
-| Current work | None open; await instruction |
-| Next approved implementation | **None** — wait for explicit instruction |
-| Packaging | **Locally packable**; **not publicly published** |
+| Last completed phase | **Phase I-5 — Public Preview Preparation & Final Dry Run** |
+| Current work | None open; await **explicit publish approval** |
+| Next approved implementation | **None** — NuGet publish only after owner approval |
+| Packaging | **Public-preview ready pending explicit publish approval** |
 | Production HTTP controllers | **None** in library projects |
 | Sample / disposable consumers | Deleted after validation (not product) |
 
 ## Latest Verified Baseline
 
-Verified in-repo on **2026-09-14** (after Phase I-3):
+Verified in-repo on **2026-09-14** (after Phase I-5):
 
 ```text
 Domain                36
@@ -46,15 +48,15 @@ Skipped: 0
 
 ## Completed Phases (summary)
 
-Early numbered phases → letter phases **A**–**H**; **I-0** Rate Limiting; **I-1** Permixa branding; **I-2** local NuGet packaging; **I-3** optional Redis/Resend provider packages.
+Early numbered phases → **A**–**H**; **I-0**–**I-5** (Rate Limiting → branding → packaging → providers → readiness → public preview prep).
 
 See [CHANGELOG-PHASES.md](CHANGELOG-PHASES.md) and [phases/](phases/).
 
 ## Current / Next Approved Work
 
-- **Now:** No open implementation phase. Provider split done (ADR-0016). Local packaging includes six packages.
-- **Next:** Owner decisions for public preview (license, repository URL, SourceLink, README/icon) — then explicit publish approval.
-- Do **not** `nuget push` / create tags / templates without approval.
+- **Now:** Preview preparation complete (ADR-0017). **Do not** `nuget push` / tag / GitHub Release without explicit approval.
+- **Next:** Owner-approved publish of `0.1.0-preview.1` to NuGet.org (and optional prefix reservation after).
+- Push local `master` to GitHub when owner directs.
 
 ## Critical Architecture Decisions (selected)
 
@@ -62,35 +64,30 @@ See [CHANGELOG-PHASES.md](CHANGELOG-PHASES.md) and [phases/](phases/).
 |----------|--------|
 | Identity owns Users/Roles/passwords | Implemented |
 | Permissions / RoleLevel not in JWT | Implemented |
-| Permission precedence + default deny | Implemented |
 | Redis = disposable authz cache; SQL = source of truth | Implemented |
-| Rate Limiting = opt-in AspNetCore config layer | ADR-0013 |
-| Product identity = Permixa | ADR-0014 |
-| PackageIds `Permixa.*`; primary `Permixa.AspNetCore`; local preview `0.1.0-preview.1`; license deferred | ADR-0015 |
-| Optional Redis/Resend provider packages; core does not pull those SDKs | ADR-0016 |
+| Optional Redis/Resend provider packages | ADR-0016 |
+| Apache-2.0 core; canonical GitHub repo; SourceLink; validation CI | ADR-0017 |
 
 ## Permanent Agent Rules
 
-1. Implementation agent — STOP on unapproved architecture/security/public-API/license/publish decisions.
+1. STOP on unapproved architecture/security/public-API/license/**publish** decisions.
 2. Do not invent historical rationale.
 3. Set-based DB access (`.cursor/rules/database-access.mdc`).
-4. Update `/docs` after non-trivial work (`.cursor/rules/project-documentation.mdc`).
+4. Update `/docs` after non-trivial work.
 5. Do not reintroduce Foundation branding or publish packages without approval.
 
 ## Deferred Scope
 
-See [DEFERRED-SCOPE.md](DEFERRED-SCOPE.md). Highlights: public publish, license, SourceLink, templates, SMS/passkeys, distributed rate limiting, unified `AddPermixa()` facade, moving `IEmailSender` to Application.
+See [DEFERRED-SCOPE.md](DEFERRED-SCOPE.md). Highlights: package icon, `Permixa.*` prefix reservation, CLA/DCO, templates, SMS/passkeys, `AddPermixa()` facade.
 
 ## Required Reading
 
 1. This file  
 2. [CURRENT-STATE.md](CURRENT-STATE.md)  
 3. [SECURITY-MODEL.md](SECURITY-MODEL.md)  
-4. [ARCHITECTURE.md](ARCHITECTURE.md)  
-5. [architecture/PROVIDER-PACKAGES.md](architecture/PROVIDER-PACKAGES.md)  
-6. [decisions/README.md](decisions/README.md)  
-7. Relevant [architecture/](architecture/) + [phases/](phases/) docs  
+4. Root [README.md](../README.md) (public)  
+5. [decisions/README.md](decisions/README.md)  
 
 ## Last Documentation Update
 
-**2026-09-14** — Phase I-3: optional Redis/Resend provider packages; core AspNetCore install no longer pulls those SDKs.
+**2026-09-14** — Phase I-5: public preview preparation complete; not published.

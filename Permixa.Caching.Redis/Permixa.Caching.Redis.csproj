@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageId>Permixa.Caching.Redis</PackageId>
-    <Title>Permixa IAM — Redis Authorization Cache</Title>
+    <Title>Permixa IAM - Redis Authorization Cache</Title>
     <Description>Optional Redis authorization-cache provider for Permixa IAM. Install only when using AddPermixaRedisAuthorizationCache; core Permixa packages do not require StackExchange.Redis.</Description>
     <PackageTags>permixa;redis;caching;authorization-cache;stackexchange-redis;aspnetcore;dotnet;iam</PackageTags>
     <RootNamespace>Permixa.Caching.Redis</RootNamespace>

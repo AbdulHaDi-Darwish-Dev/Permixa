@@ -7,14 +7,16 @@
 
 | Item | Value |
 |------|--------|
-| Last completed phase | **Phase I-3 — Optional Redis & Resend provider package split** |
-| Current phase / work | None — await explicit instruction |
+| Last completed phase | **Phase I-5 — Public Preview Preparation & Final Dry Run** |
+| Current phase / work | None — await **explicit NuGet publish approval** |
 | Next approved implementation | **None** |
-| Packaging | **Locally packable** (`0.1.0-preview.1`); **not publicly published** |
+| Packaging | **Public-preview ready pending explicit publish approval** |
+| License | Apache-2.0 |
+| Canonical repository | https://github.com/AbdulHaDi-Darwish-Dev/Permixa |
 
 ## Latest verified baseline
 
-Date: **2026-09-14** (after Phase I-3 provider split)
+Date: **2026-09-14** (after Phase I-5)
 
 ```text
 Domain                36
@@ -46,29 +48,16 @@ Skipped: 0
 
 | Item | Status |
 |------|--------|
-| Local `dotnet pack` (6 packages) | Verified |
-| Core install without Redis/Resend SDKs | Verified (nuspec + consumers A–D) |
-| PackageReference consumers | Verified then deleted |
-| Public nuget.org / GitHub Packages | **Not published** |
-| License | **Not finalized** (omitted from local packages) |
-| RepositoryUrl / SourceLink | Deferred |
-| Package README / icon | Pre-public work |
-| Classification | **Locally packable but not publication-ready** |
-
-## Implemented modules (summary)
-
-| Area | Status |
-|------|--------|
-| Domain / Application / Infrastructure / AspNetCore | Implemented |
-| Optional Redis authorization-cache provider | Implemented (`Permixa.Caching.Redis`) |
-| Optional Resend email transport provider | Implemented (`Permixa.Email.Resend`) |
-| Provider-neutral `AddPermixaEmailDelivery` | Implemented |
-| Local NuGet packages | Implemented (preview) |
-| Production HTTP controllers in packages | Not implemented (by design) |
+| Local `dotnet pack` (6 packages) | Verified (I-5 dry-run) |
+| License / RepositoryUrl / SourceLink / READMEs | Configured (ADR-0017) |
+| Validation CI workflow | Present (no publish) |
+| Package icon | Deferred |
+| Public nuget.org | **Not published** |
+| Classification | **Public-preview ready pending explicit publish approval** |
 
 ## Migrations
 
-Under `Permixa.Infrastructure/Persistence/Migrations/` (unchanged through I-3 — **no schema change**):
+Unchanged through I-5 (no schema change in this phase):
 
 1. `20260910144455_InitialCreate`
 2. `20260910160808_AddRefreshTokenFamilyId`
@@ -82,13 +71,12 @@ Under `Permixa.Infrastructure/Persistence/Migrations/` (unchanged through I-3 �
 
 | Topic | Classification |
 |-------|----------------|
-| Permanent product license | Owner decision required before public publish |
-| Canonical public repository URL | Deferred |
-| SourceLink | Deferred |
-| Package README / icon / public CHANGELOG | Pre-public |
-| Move `IEmailSender` to Application | Deferred (acceptable in Infrastructure for now) |
-| Unified `AddPermixa(...)` facade | Future DX decision (not approved) |
-| NuGet prefix reservation / PackageId availability | Pre-public |
+| NuGet.org publish of `0.1.0-preview.1` | Owner approval required |
+| `Permixa.*` prefix reservation | After first publish |
+| Package icon | Non-blocking |
+| CLA / DCO | Before accepting substantial external PRs |
+| Unified `AddPermixa(...)` facade | Deferred |
+| Move `IEmailSender` to Application | Deferred |
 
 ## Next documentation maintenance rule
 
