@@ -1,0 +1,46 @@
+---
+description: Keep /docs project memory current after non-trivial changes
+alwaysApply: true
+---
+
+# Project documentation — durable repository memory
+
+Permixa’s canonical project memory lives under `/docs`.
+
+`docs/AGENT-HANDOFF.md` is the first file any new AI agent should read.
+
+## Before completing any non-trivial implementation task
+
+1. Inspect whether the change affects documented behavior.
+2. Update relevant `/docs` files.
+3. Update `/docs/CURRENT-STATE.md`.
+4. Update `/docs/AGENT-HANDOFF.md` (keep it concise; link deeper docs).
+5. Add/update an ADR under `/docs/decisions` if an architecture/security/public-API/schema/concurrency decision was approved.
+6. Update phase history (`/docs/CHANGELOG-PHASES.md` and/or `/docs/phases/*`) if a phase/task milestone changed.
+7. Update migrations/schema documentation when relevant.
+8. Update test totals only after verification.
+9. Never fabricate historical rationale. If WHY is unknown, say so.
+10. Never describe planned behavior as implemented.
+11. Preserve intentionally rejected/deferred approaches when useful (`DEFERRED-SCOPE.md`, ADRs).
+12. Keep AGENT-HANDOFF concise; link to deeper docs instead of duplicating them.
+
+## AGENT-HANDOFF living state
+
+Update `docs/AGENT-HANDOFF.md` when any of these change:
+
+- completed phase / current phase / next approved work
+- verified test/build baseline
+- critical architecture or security invariant
+- major public API
+- deferred scope
+- important migration/schema state
+
+Do not rewrite the entire handoff after every tiny task — keep it current and short.
+
+## Trivial changes
+
+Formatting/typo-only changes with no behavioral significance do not require documentation updates.
+
+## Feature completeness
+
+A feature is not fully complete if important architecture/security/public behavior changed but `/docs` still describes the old behavior.

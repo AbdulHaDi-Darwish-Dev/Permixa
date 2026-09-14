@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Permixa.AspNetCore</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackageId>Permixa.AspNetCore</PackageId>
+    <Title>Permixa IAM for ASP.NET Core</Title>
+    <Description>Reusable security and Identity &amp; Access Management framework for ASP.NET Core with authentication, RBAC, fine-grained permissions, JWT and refresh-token sessions, verification and OTP workflows, authorization caching, MFA, account security, auditing, Rate Limiting, and ASP.NET Core integration.</Description>
+    <PackageTags>permixa;aspnetcore;dotnet;identity;iam;identity-access-management;authentication;authorization;rbac;permissions;roles;role-hierarchy;access-control;jwt;refresh-token;sessions;session-management;caching;authorization-cache;email-verification;otp;verification;password-reset;account-security;mfa;totp;recovery-codes;security;audit;security-audit;rate-limiting;aspnetcore-identity;ef-core;sql-server</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Permixa.Application\Permixa.Application.csproj" />
+    <ProjectReference Include="..\Permixa.Infrastructure\Permixa.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Permixa.AspNetCore.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+  </ItemGroup>
+
+</Project>

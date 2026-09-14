@@ -1,0 +1,10 @@
+{{ApplicationName}}
+{{CompanyLine}}
+Confirm your email address by opening this link:
+
+{{VerificationUrl}}
+
+This link expires in {{ExpirationMinutes}} minutes.
+
+If you did not request this confirmation, you can ignore this email.
+{{SupportLine}}

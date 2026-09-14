@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test-pack:
+    name: Build, test, and pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore Permixa.slnx
+
+      - name: Build (Release)
+        run: dotnet build Permixa.slnx -c Release --no-restore
+
+      - name: Test (Release)
+        run: dotnet test Permixa.slnx -c Release --no-build --verbosity minimal
+
+      - name: Pack (Release)
+        run: |
+          mkdir -p artifacts/ci-pack
+          dotnet pack Permixa.Domain/Permixa.Domain.csproj -c Release -o artifacts/ci-pack --no-build
+          dotnet pack Permixa.Application/Permixa.Application.csproj -c Release -o artifacts/ci-pack --no-build
+          dotnet pack Permixa.Infrastructure/Permixa.Infrastructure.csproj -c Release -o artifacts/ci-pack --no-build
+          dotnet pack Permixa.AspNetCore/Permixa.AspNetCore.csproj -c Release -o artifacts/ci-pack --no-build
+          dotnet pack Permixa.Caching.Redis/Permixa.Caching.Redis.csproj -c Release -o artifacts/ci-pack --no-build
+          dotnet pack Permixa.Email.Resend/Permixa.Email.Resend.csproj -c Release -o artifacts/ci-pack --no-build
+
+      - name: Inspect package graphs
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          function Get-Nuspec([string]$path) {
+            $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $path))
+            try {
+              $entry = $zip.Entries | Where-Object { $_.Name -like '*.nuspec' } | Select-Object -First 1
+              $reader = New-Object System.IO.StreamReader($entry.Open())
+              $text = $reader.ReadToEnd()
+              $reader.Close()
+              return $text
+            } finally { $zip.Dispose() }
+          }
+          $asp = Get-Nuspec 'artifacts/ci-pack/Permixa.AspNetCore.0.1.0-preview.1.nupkg'
+          if ($asp -match 'StackExchange.Redis' -or $asp -match 'id="Resend"') {
+            throw 'Permixa.AspNetCore must not depend on StackExchange.Redis or Resend'
+          }
+          $redis = Get-Nuspec 'artifacts/ci-pack/Permixa.Caching.Redis.0.1.0-preview.1.nupkg'
+          if ($redis -notmatch 'StackExchange.Redis') { throw 'Redis package missing StackExchange.Redis' }
+          if ($redis -match 'id="Resend"') { throw 'Redis package must not depend on Resend' }
+          $resend = Get-Nuspec 'artifacts/ci-pack/Permixa.Email.Resend.0.1.0-preview.1.nupkg'
+          if ($resend -notmatch 'id="Resend"') { throw 'Resend package missing Resend dependency' }
+          if ($resend -match 'StackExchange.Redis') { throw 'Resend package must not depend on Redis' }
+          Write-Host 'Package graph inspection OK'
+
+      # Intentionally no nuget push / release / tagging steps.

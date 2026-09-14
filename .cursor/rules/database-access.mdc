@@ -1,0 +1,43 @@
+---
+description: Set-based database access; forbid N+1 persistence queries
+alwaysApply: true
+---
+
+# Database Access — Set-Based by Default
+
+Database access must be set-based by default.
+
+Never introduce repository, EF Core, Identity persistence, or other database-backed calls inside iteration when the operation can reasonably be performed using a bulk query.
+
+Always inspect new database-access code for N+1 behavior.
+
+N parallel queries using `Task.WhenAll` are still N queries and are not a valid N+1 fix.
+
+Database query count should generally remain bounded as the number of processed items increases.
+
+Do not over-optimize fixed O(1) query sequences merely to reduce query count.
+
+Never call `SaveChanges` / `SaveChangesAsync` repeatedly inside a loop when the changes can be committed as one unit of work.
+
+Treat lazy-loaded navigation access inside iteration as potential N+1 and verify the generated database access.
+
+If persistence inside iteration is genuinely unavoidable, explicitly explain why a set-based/bulk operation is not appropriate before implementing it.
+
+## Forbidden
+
+- Repository / EF Core / Identity persistence calls inside `foreach` / `for` / `while` over collections
+- `Task.WhenAll` over N per-item database queries as a substitute for bulk loading
+- Lazy-loaded navigation access that triggers per-item queries
+- Repeated `SaveChanges` / `SaveChangesAsync` inside a loop when one unit of work can commit all changes
+
+## Preferred
+
+- Collect and deduplicate ids, then one bulk query (`GetByIdsAsync` / `Where(ids.Contains(...))`)
+- Dedicated set-based repository methods for use-case data shapes
+- Projections when full entity graphs are unnecessary
+- Stage all mutations, then a single `SaveChangesAsync`
+
+## Acceptable
+
+- Fixed O(1) sequential lookups in a single-item use case (existence check, load one entity, save once)
+- Persistence inside iteration only when bulk is genuinely inappropriate, with an explicit written justification

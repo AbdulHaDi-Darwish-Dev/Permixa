@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>Permixa.Email.Resend</PackageId>
+    <Title>Permixa IAM — Resend Email Provider</Title>
+    <Description>Optional Resend email transport provider for Permixa IAM. Install only when using AddPermixaResendEmail; core Permixa packages do not require the Resend SDK. Pair with AddPermixaEmailDelivery for the provider-neutral email pipeline.</Description>
+    <PackageTags>permixa;resend;email;verification;aspnetcore;dotnet;iam</PackageTags>
+    <RootNamespace>Permixa.Email.Resend</RootNamespace>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Permixa.Infrastructure\Permixa.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+    <PackageReference Include="Resend" Version="0.16.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

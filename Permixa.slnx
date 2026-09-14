@@ -1,0 +1,15 @@
+<Solution>
+  <Project Path="Permixa.Application.Tests/Permixa.Application.Tests.csproj" />
+  <Project Path="Permixa.Application/Permixa.Application.csproj" />
+  <Project Path="Permixa.AspNetCore.Tests/Permixa.AspNetCore.Tests.csproj" />
+  <Project Path="Permixa.AspNetCore/Permixa.AspNetCore.csproj" />
+  <Project Path="Permixa.Caching.Redis.Tests/Permixa.Caching.Redis.Tests.csproj" />
+  <Project Path="Permixa.Caching.Redis/Permixa.Caching.Redis.csproj" />
+  <Project Path="Permixa.Domain.Tests/Permixa.Domain.Tests.csproj" />
+  <Project Path="Permixa.Domain/Permixa.Domain.csproj" />
+  <Project Path="Permixa.Email.Resend.Tests/Permixa.Email.Resend.Tests.csproj" />
+  <Project Path="Permixa.Email.Resend/Permixa.Email.Resend.csproj" />
+  <Project Path="Permixa.Infrastructure.Tests/Permixa.Infrastructure.Tests.csproj" />
+  <Project Path="Permixa.Infrastructure/Permixa.Infrastructure.csproj" />
+  <Project Path="Permixa.IntegrationTests/Permixa.IntegrationTests.csproj" />
+</Solution>

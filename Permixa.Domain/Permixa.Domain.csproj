@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>Permixa.Domain</PackageId>
+    <Title>Permixa IAM - Domain</Title>
+    <Description>Core domain models and security primitives for Permixa IAM, including permissions, authorization rules, refresh-token state, verification concepts, MFA challenge state, and IAM audit log entities.</Description>
+    <PackageTags>dotnet;iam;identity-access-management;permissions;authorization;rbac;security;domain;permixa</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

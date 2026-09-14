@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>Permixa.Application</PackageId>
+    <Title>Permixa IAM - Application</Title>
+    <Description>Application contracts and IAM workflows for Permixa, including authentication, authorization, RBAC, user administration, sessions, verification, credential security, MFA, authorization caching abstractions, and security auditing.</Description>
+    <PackageTags>dotnet;iam;authentication;authorization;rbac;permissions;sessions;mfa;verification;audit;security;permixa</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Permixa.Domain\Permixa.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
