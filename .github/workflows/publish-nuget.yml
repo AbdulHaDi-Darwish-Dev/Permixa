@@ -1,0 +1,82 @@
+name: Publish NuGet
+
+# Manual-only first publish via NuGet.org Trusted Publishing (OIDC).
+# Bound Trusted Publishing policy workflow filename: publish-nuget.yml
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Build, test, pack, and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore Permixa.slnx
+
+      - name: Build (Release)
+        run: dotnet build Permixa.slnx -c Release --no-restore
+
+      - name: Test (Release)
+        # Full suite including Testcontainers-backed Infrastructure/Integration tests.
+        # ubuntu-latest provides Docker for Testcontainers.
+        run: dotnet test Permixa.slnx -c Release --no-build --verbosity minimal
+
+      - name: Pack (Release)
+        run: |
+          mkdir -p artifacts/publish
+          # Exact production packages only; version comes from Directory.Build.props (0.1.0-preview.1).
+          # Also emits matching .snupkg beside each .nupkg.
+          dotnet pack Permixa.Domain/Permixa.Domain.csproj -c Release -o artifacts/publish --no-build
+          dotnet pack Permixa.Application/Permixa.Application.csproj -c Release -o artifacts/publish --no-build
+          dotnet pack Permixa.Infrastructure/Permixa.Infrastructure.csproj -c Release -o artifacts/publish --no-build
+          dotnet pack Permixa.Caching.Redis/Permixa.Caching.Redis.csproj -c Release -o artifacts/publish --no-build
+          dotnet pack Permixa.Email.Resend/Permixa.Email.Resend.csproj -c Release -o artifacts/publish --no-build
+          dotnet pack Permixa.AspNetCore/Permixa.AspNetCore.csproj -c Release -o artifacts/publish --no-build
+
+      - name: NuGet login (OIDC → temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          # nuget.org profile username (not email). Public identifier, not a credential.
+          user: abdulhadi
+
+      - name: Publish packages (dependency order)
+        env:
+          NUGET_AUTH_TOKEN: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          SOURCE="https://api.nuget.org/v3/index.json"
+          # Exact paths only — no wildcards. Matching .snupkg files are pushed with each .nupkg.
+          # Fail-fast: any push failure stops the job immediately.
+          packages=(
+            "artifacts/publish/Permixa.Domain.0.1.0-preview.1.nupkg"
+            "artifacts/publish/Permixa.Application.0.1.0-preview.1.nupkg"
+            "artifacts/publish/Permixa.Infrastructure.0.1.0-preview.1.nupkg"
+            "artifacts/publish/Permixa.Caching.Redis.0.1.0-preview.1.nupkg"
+            "artifacts/publish/Permixa.Email.Resend.0.1.0-preview.1.nupkg"
+            "artifacts/publish/Permixa.AspNetCore.0.1.0-preview.1.nupkg"
+          )
+          for pkg in "${packages[@]}"; do
+            if [[ ! -f "$pkg" ]]; then
+              echo "Missing package file: $pkg" >&2
+              exit 1
+            fi
+            echo "Publishing $pkg"
+            dotnet nuget push "$pkg" \
+              --api-key "$NUGET_AUTH_TOKEN" \
+              --source "$SOURCE"
+          done
