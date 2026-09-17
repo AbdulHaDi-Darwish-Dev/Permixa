@@ -1,29 +1,36 @@
 <Project>
-  <!-- Shared packaging defaults for Permixa production libraries. -->
-  <PropertyGroup>
-    <Authors>Abdulhadi Darwish</Authors>
-    <Copyright>Copyright (c) 2026 Abdulhadi Darwish</Copyright>
-    <Company>Abdulhadi Darwish</Company>
-    <Product>Permixa IAM</Product>
-    <Version>0.1.0-preview.1</Version>
-    <PackageVersion>0.1.0-preview.1</PackageVersion>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <RepositoryUrl>https://github.com/AbdulHaDi-Darwish-Dev/Permixa</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/AbdulHaDi-Darwish-Dev/Permixa</PackageProjectUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true' Or '$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-    <!-- Full XML docs deferred for preview to avoid CS1591 noise; critical APIs documented in source. -->
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NeutralLanguage>en</NeutralLanguage>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-  </ItemGroup>
-</Project>
+  <!-- Shared packaging defaults for Permixa production libraries + Templates. -->
+  <PropertyGroup>
+    <Authors>Abdulhadi Darwish</Authors>
+    <Copyright>Copyright (c) 2026 Abdulhadi Darwish</Copyright>
+    <Company>Abdulhadi Darwish</Company>
+    <Product>Permixa IAM</Product>
+    <Version>0.1.0-preview.2</Version>
+    <PackageVersion>0.1.0-preview.2</PackageVersion>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/AbdulHaDi-Darwish-Dev/Permixa</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/AbdulHaDi-Darwish-Dev/Permixa</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageIcon>permixa-icon.png</PackageIcon>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true' Or '$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <!-- Full XML docs deferred for preview to avoid CS1591 noise; critical APIs documented in source. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <!-- Single canonical icon; packed into every IsPackable project nupkg as permixa-icon.png -->
+    <None Include="$(MSBuildThisFileDirectory)assets\permixa-icon.png"
+          Pack="true"
+          PackagePath="permixa-icon.png"
+          Visible="false"
+          Condition="Exists('$(MSBuildThisFileDirectory)assets\permixa-icon.png')" />
+  </ItemGroup>
+</Project>

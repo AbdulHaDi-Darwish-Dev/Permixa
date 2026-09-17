@@ -1,7 +1,21 @@
 name: Publish NuGet
 
-# Manual-only first publish via NuGet.org Trusted Publishing (OIDC).
-# Bound Trusted Publishing policy workflow filename: publish-nuget.yml
+# Manual-only lockstep preview publish via NuGet.org Trusted Publishing (OIDC).
+# This is the ONLY publication workflow during preview. Do not reintroduce a
+# Templates-only (or other scoped) publish workflow without explicit owner decision.
+#
+# Required NuGet.org Trusted Publishing association:
+#   repository: AbdulHaDi-Darwish-Dev/Permixa
+#   workflow:   publish-nuget.yml
+#   package scope must cover ALL SEVEN packages, including Permixa.Templates
+#
+# OWNER MUST VERIFY nuget.org Trusted Publishing package scope covers:
+#   Permixa.Domain, Permixa.Application, Permixa.Infrastructure,
+#   Permixa.AspNetCore, Permixa.Caching.Redis, Permixa.Email.Resend,
+#   Permixa.Templates
+# (package scope on nuget.org is not proven from this repository alone.)
+#
+# Publishes all seven packages at PackageVersion from Directory.Build.props.
 on:
   workflow_dispatch:
 
@@ -24,6 +38,19 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Resolve package version from Directory.Build.props
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(grep -oP '(?<=<PackageVersion>)[^<]+' Directory.Build.props | head -n1)"
+          if [[ -z "$VERSION" ]]; then
+            echo "Could not read PackageVersion from Directory.Build.props" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved PackageVersion=$VERSION"
+
       - name: Restore
         run: dotnet restore Permixa.slnx
 
@@ -37,15 +64,46 @@ jobs:
 
       - name: Pack (Release)
         run: |
+          set -euo pipefail
           mkdir -p artifacts/publish
-          # Exact production packages only; version comes from Directory.Build.props (0.1.0-preview.1).
-          # Also emits matching .snupkg beside each .nupkg.
+          # Version comes from Directory.Build.props. Framework packs use --no-build after test.
+          # Templates packs content (no framework build output required).
           dotnet pack Permixa.Domain/Permixa.Domain.csproj -c Release -o artifacts/publish --no-build
           dotnet pack Permixa.Application/Permixa.Application.csproj -c Release -o artifacts/publish --no-build
           dotnet pack Permixa.Infrastructure/Permixa.Infrastructure.csproj -c Release -o artifacts/publish --no-build
           dotnet pack Permixa.Caching.Redis/Permixa.Caching.Redis.csproj -c Release -o artifacts/publish --no-build
           dotnet pack Permixa.Email.Resend/Permixa.Email.Resend.csproj -c Release -o artifacts/publish --no-build
           dotnet pack Permixa.AspNetCore/Permixa.AspNetCore.csproj -c Release -o artifacts/publish --no-build
+          dotnet pack Permixa.Templates/Permixa.Templates.csproj -c Release -o artifacts/publish
+
+      - name: Assert exact seven nupkgs
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+          packages=(
+            "artifacts/publish/Permixa.Domain.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Application.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Infrastructure.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Caching.Redis.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Email.Resend.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.AspNetCore.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Templates.${VERSION}.nupkg"
+          )
+          for pkg in "${packages[@]}"; do
+            if [[ ! -f "$pkg" ]]; then
+              echo "Missing package file: $pkg" >&2
+              ls -la artifacts/publish || true
+              exit 1
+            fi
+          done
+          count="$(find artifacts/publish -maxdepth 1 -type f -name '*.nupkg' | wc -l)"
+          if [[ "$count" -ne 7 ]]; then
+            echo "Expected exactly 7 .nupkg files; found $count:" >&2
+            find artifacts/publish -maxdepth 1 -type f -name '*.nupkg' | sort >&2
+            exit 1
+          fi
+          echo "OK: seven packages at ${VERSION}"
 
       - name: NuGet login (OIDC → temporary API key)
         uses: NuGet/login@v1
@@ -59,16 +117,18 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
           SOURCE="https://api.nuget.org/v3/index.json"
           # Exact paths only — no wildcards. Matching .snupkg files are pushed with each .nupkg.
-          # Fail-fast: any push failure stops the job immediately.
+          # Fail-fast: any push failure stops the job immediately. Skip-duplicate forbidden.
           packages=(
-            "artifacts/publish/Permixa.Domain.0.1.0-preview.1.nupkg"
-            "artifacts/publish/Permixa.Application.0.1.0-preview.1.nupkg"
-            "artifacts/publish/Permixa.Infrastructure.0.1.0-preview.1.nupkg"
-            "artifacts/publish/Permixa.Caching.Redis.0.1.0-preview.1.nupkg"
-            "artifacts/publish/Permixa.Email.Resend.0.1.0-preview.1.nupkg"
-            "artifacts/publish/Permixa.AspNetCore.0.1.0-preview.1.nupkg"
+            "artifacts/publish/Permixa.Domain.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Application.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Infrastructure.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Caching.Redis.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Email.Resend.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.AspNetCore.${VERSION}.nupkg"
+            "artifacts/publish/Permixa.Templates.${VERSION}.nupkg"
           )
           for pkg in "${packages[@]}"; do
             if [[ ! -f "$pkg" ]]; then

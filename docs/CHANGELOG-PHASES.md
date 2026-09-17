@@ -51,11 +51,13 @@ Early 9.5 draft labeled MFA as “E” and Phone/SMS as “F”. **Actual execut
 | T2 | Permixa.Templates local implementation | `permixa-app` template packable locally; four variants validated for generate/build; **not published** |
 | T2.1 | Template verification & security audit | Docker/Testcontainers: all four variants green; AppPermissionSeeder audit **B**; JSON/`AddPermixaVerification` host fixes; **not published** |
 | T2.2 | Template final hardening | Seeder fail-fast AuthorizationState; AppSeed default false; `safe_namespace` for hyphenated `-n`; regression green; **not published** |
-| T3 | Templates publication preparation | Metadata/README/nupkg consumer smoke; templates-only publish strategy recommended; **not published** |
-| T3.1 | Templates-only publication workflow | `publish-nuget-templates.yml` (OIDC, Templates only); **not published** |
+| T3 | Templates publication preparation | Metadata/README/nupkg consumer smoke; **not published** |
+| T3.1 | Templates-only publication workflow | Added then **removed in R2.1** — preview uses lockstep `publish-nuget.yml` only |
+| R2 | Unified preview.2 branding + release prep | Version `0.1.0-preview.2`, shared icon, Templates in main publish workflow; **RC not published** |
+| R2.1 | Preview.2 release lockdown | Removed `publish-nuget-templates.yml`; lockstep-only publish train; **not published** |
 
 Phone/SMS (once floated as “Phase F” in inspection notes) remains **deferred**.
 
 ## Latest verified baseline
 
-See [CURRENT-STATE.md](CURRENT-STATE.md). Framework package baseline remains the I-5 suite unless re-verified. Template T2.1 verified with Docker (see CURRENT-STATE tables).
+See [CURRENT-STATE.md](CURRENT-STATE.md). R2 re-verified framework **556/556** and template Docker/Testcontainers matrix against local `0.1.0-preview.2` packs.

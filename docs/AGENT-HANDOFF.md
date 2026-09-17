@@ -12,9 +12,10 @@ It builds **on top of ASP.NET Core Identity** and adds permissions, overrides, r
 **Previous internal name:** Foundation (Phase I-1 / ADR-0014). Do not reintroduce Foundation product branding.
 
 Solution: `Permixa.slnx`  
-Primary NuGet package: `Permixa.AspNetCore` @ `0.1.0-preview.1` (published on nuget.org)  
+Primary NuGet package: `Permixa.AspNetCore` @ `0.1.0-preview.2` (RC; preview.1 still on nuget.org until publish)  
 Optional providers: `Permixa.Caching.Redis`, `Permixa.Email.Resend`  
-Templates (local): `Permixa.Templates` / `permixa-app` @ `0.1.0-preview.1` — **ready for publication; not published yet**  
+Templates: `Permixa.Templates` / `permixa-app` @ `0.1.0-preview.2` (RC; **not published yet**)  
+Package icon: `assets/permixa-icon.png`  
 Canonical repo: https://github.com/AbdulHaDi-Darwish-Dev/Permixa  
 License: **Apache-2.0**
 
@@ -22,22 +23,18 @@ License: **Apache-2.0**
 
 | Item | State |
 |------|--------|
-| Last completed phase | **Phase T3.1 — Templates-only publication workflow** |
-| Current work | Await owner Trusted Publishing policy for `publish-nuget-templates.yml` + publish approval |
+| Last completed phase | **Phase R2.1 — Preview.2 release lockdown** |
+| Current work | Await owner publish approval for `0.1.0-preview.2` |
+| Preview publish | Lockstep only via `publish-nuget.yml` (seven packages) |
 | Next approved implementation | **None** until explicitly directed |
-| Framework packages | Published `0.1.0-preview.1` |
-| Templates | Workflow ready; **not published** — do not nuget push without approval |
+| nuget.org today | Framework `0.1.0-preview.1` published; Templates / preview.2 **not** published |
 | Production HTTP controllers | **None** in library projects |
 
 ## Latest Verified Baseline
 
-Framework tests (I-5 era, re-run if claiming new totals):
-
-```text
-Total                556 / 556 (historical I-5)
-```
-
-Template T2.2 + pre-T3 Program cleanup + **T3 publication prep** (metadata/README/nupkg smoke). Four variants previously **pass** (8/9/8/9). Templates **not published**.
+- Framework: **556 / 556** passed (0 skipped) — R2 fresh Release run
+- Templates (local RC feed): base 8, `--redis` 9, `--resend` 8, `--redis --resend` 9; rename builds OK
+- See [CURRENT-STATE.md](CURRENT-STATE.md)
 
 ## Critical Architecture Decisions (selected)
 
@@ -49,6 +46,7 @@ Template T2.2 + pre-T3 Program cleanup + **T3 publication prep** (metadata/READM
 | Optional Redis/Resend provider packages | ADR-0016 |
 | Apache-2.0 core; canonical GitHub repo; SourceLink; validation CI | ADR-0017 |
 | Consumer template: CA host + two DbContexts + `--redis`/`--resend` | Phase T1/T2 |
+| Shared NuGet icon | R2 (`assets/permixa-icon.png`) |
 
 ## Permanent Agent Rules
 
@@ -72,4 +70,4 @@ See [DEFERRED-SCOPE.md](DEFERRED-SCOPE.md).
 
 ## Last Documentation Update
 
-**2026-09-17** — Phase T3.1: added `publish-nuget-templates.yml` (templates-only OIDC push). Templates still not published.
+**2026-09-17** — Phase R2.1: `0.1.0-preview.2` lockdown (removed Templates-only publish workflow; lockstep `publish-nuget.yml` only). **Not published.**

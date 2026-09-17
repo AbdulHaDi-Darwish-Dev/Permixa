@@ -34,4 +34,4 @@ Call after `AddPermixaInfrastructure`. The Redis registration replaces the defau
 
 ## License
 
-Apache-2.0 — preview package (`0.1.0-preview.1`).
+Apache-2.0 — preview package (`0.1.0-preview.2`).

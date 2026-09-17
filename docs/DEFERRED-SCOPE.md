@@ -7,7 +7,10 @@ Intentionally deferred or paused work. Not “forgotten” unless marked otherwi
 | Item | Status |
 |------|--------|
 | NuGet framework packages `0.1.0-preview.1` | **Published** on nuget.org (see GitHub Release `v0.1.0-preview.1`) |
-| .NET project templates (`Permixa.Templates` / `permixa-app`) | **Ready for publication** (Phase T3); **not published** to nuget.org yet |
+| Unified `0.1.0-preview.2` (seven packages + icon) | **Release candidate** — ready for owner publish approval; **not published** |
+| Preview publish train | **Lockstep** — only `.github/workflows/publish-nuget.yml` (Templates-only workflow removed in R2.1) |
+| .NET project templates (`Permixa.Templates` / `permixa-app`) | Included in preview.2 RC; **not published** yet |
+| Package icon | **Resolved** for preview.2 — `assets/permixa-icon.png` |
 | Permanent product license | **Resolved** — Apache-2.0 for Permixa Core (ADR-0017) |
 | RepositoryUrl / SourceLink / package README | **Resolved** for preview (ADR-0017); icon deferred |
 | Public API trim / analyzer package | Not implemented |
@@ -15,7 +18,7 @@ Intentionally deferred or paused work. Not “forgotten” unless marked otherwi
 | Unified `AddPermixa()` registration facade | Future DX recommendation only |
 | NuGet prefix reservation (`Permixa.*`) | Deferred / verify after publishes |
 | CLA / DCO for external PRs | Deferred — CONTRIBUTING limits PR acceptance for now |
-| Package icon | Deferred (non-blocking for preview) |
+| Package icon | Deferred (non-blocking for preview) — **superseded by R2** (`assets/permixa-icon.png`) |
 | Cursor `.cursor/rules` in generated apps | Deferred (v1 uses `AGENTS.md`) |
 
 ## Identity / MFA / verification

@@ -45,6 +45,8 @@ jobs:
         shell: pwsh
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $ver = ([regex]::Match((Get-Content Directory.Build.props -Raw), '<PackageVersion>([^<]+)</PackageVersion>')).Groups[1].Value
+          if (-not $ver) { throw 'Could not read PackageVersion from Directory.Build.props' }
           function Get-Nuspec([string]$path) {
             $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $path))
             try {
@@ -55,20 +57,37 @@ jobs:
               return $text
             } finally { $zip.Dispose() }
           }
-          $asp = Get-Nuspec 'artifacts/ci-pack/Permixa.AspNetCore.0.1.0-preview.1.nupkg'
+          function Assert-Icon([string]$path) {
+            $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $path))
+            try {
+              $icon = $zip.Entries | Where-Object { $_.FullName -eq 'permixa-icon.png' -or $_.Name -eq 'permixa-icon.png' } | Select-Object -First 1
+              if (-not $icon) { throw "Missing permixa-icon.png inside $path" }
+            } finally { $zip.Dispose() }
+            $nuspec = Get-Nuspec $path
+            if ($nuspec -notmatch '<icon>permixa-icon\.png</icon>') {
+              throw "PackageIcon metadata missing/wrong in $path"
+            }
+          }
+          $asp = Get-Nuspec "artifacts/ci-pack/Permixa.AspNetCore.$ver.nupkg"
           if ($asp -match 'StackExchange.Redis' -or $asp -match 'id="Resend"') {
             throw 'Permixa.AspNetCore must not depend on StackExchange.Redis or Resend'
           }
-          $redis = Get-Nuspec 'artifacts/ci-pack/Permixa.Caching.Redis.0.1.0-preview.1.nupkg'
+          $redis = Get-Nuspec "artifacts/ci-pack/Permixa.Caching.Redis.$ver.nupkg"
           if ($redis -notmatch 'StackExchange.Redis') { throw 'Redis package missing StackExchange.Redis' }
           if ($redis -match 'id="Resend"') { throw 'Redis package must not depend on Resend' }
-          $resend = Get-Nuspec 'artifacts/ci-pack/Permixa.Email.Resend.0.1.0-preview.1.nupkg'
+          $resend = Get-Nuspec "artifacts/ci-pack/Permixa.Email.Resend.$ver.nupkg"
           if ($resend -notmatch 'id="Resend"') { throw 'Resend package missing Resend dependency' }
           if ($resend -match 'StackExchange.Redis') { throw 'Resend package must not depend on Redis' }
-          if (-not (Test-Path 'artifacts/ci-pack/Permixa.Templates.0.1.0-preview.1.nupkg')) {
+          if (-not (Test-Path "artifacts/ci-pack/Permixa.Templates.$ver.nupkg")) {
             throw 'Permixa.Templates nupkg missing'
           }
-          Write-Host 'Package graph inspection OK'
+          foreach ($id in @(
+            'Permixa.Domain','Permixa.Application','Permixa.Infrastructure',
+            'Permixa.AspNetCore','Permixa.Caching.Redis','Permixa.Email.Resend','Permixa.Templates'
+          )) {
+            Assert-Icon "artifacts/ci-pack/$id.$ver.nupkg"
+          }
+          Write-Host "Package graph + icon inspection OK ($ver)"
 
       # Intentionally no nuget push / release / tagging steps.
 
@@ -87,22 +106,48 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Pack templates
+      - name: Pack local RC feed (framework + templates)
         run: |
-          mkdir -p artifacts/templates
-          dotnet pack Permixa.Templates/Permixa.Templates.csproj -c Release -o artifacts/templates
+          set -euo pipefail
+          mkdir -p artifacts/local-rc
+          # Local feed required until preview.2 exists on nuget.org (consumer pins match Directory.Build.props).
+          dotnet pack Permixa.Domain/Permixa.Domain.csproj -c Release -o artifacts/local-rc
+          dotnet pack Permixa.Application/Permixa.Application.csproj -c Release -o artifacts/local-rc
+          dotnet pack Permixa.Infrastructure/Permixa.Infrastructure.csproj -c Release -o artifacts/local-rc
+          dotnet pack Permixa.AspNetCore/Permixa.AspNetCore.csproj -c Release -o artifacts/local-rc
+          dotnet pack Permixa.Caching.Redis/Permixa.Caching.Redis.csproj -c Release -o artifacts/local-rc
+          dotnet pack Permixa.Email.Resend/Permixa.Email.Resend.csproj -c Release -o artifacts/local-rc
+          dotnet pack Permixa.Templates/Permixa.Templates.csproj -c Release -o artifacts/local-rc
 
       - name: Install template package
         run: |
+          set -euo pipefail
+          VER="$(grep -oP '(?<=<PackageVersion>)[^<]+' Directory.Build.props | head -n1)"
           dotnet new uninstall Permixa.Templates || true
-          dotnet new install artifacts/templates/Permixa.Templates.*.nupkg
+          dotnet new install "artifacts/local-rc/Permixa.Templates.${VER}.nupkg"
 
       - name: Validate all variants
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $root = 'artifacts/template-validation'
+          $feed = (Resolve-Path 'artifacts/local-rc').Path
           New-Item -ItemType Directory -Force -Path $root | Out-Null
+          # Parent NuGet.config so template post-action restore sees local RC before nuget.org.
+          function Write-LocalRcNugetConfig([string]$dir, [string]$feedPath) {
+            $xml = @(
+              '<?xml version="1.0" encoding="utf-8"?>',
+              '<configuration>',
+              '  <packageSources>',
+              '    <clear />',
+              "    <add key=`"local-rc`" value=`"$feedPath`" />",
+              '    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />',
+              '  </packageSources>',
+              '</configuration>'
+            ) -join [Environment]::NewLine
+            Set-Content -Path (Join-Path $dir 'NuGet.config') -Value $xml -Encoding utf8
+          }
+          Write-LocalRcNugetConfig $root $feed
 
           function Assert-NoForbidden([string]$path) {
             $files = Get-ChildItem -Recurse -File $path | Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
@@ -118,8 +163,11 @@ jobs:
 
           function Assert-PackagePin([string]$packagesProps) {
             $text = Get-Content $packagesProps -Raw
-            if ($text -notmatch 'Permixa\.AspNetCore"\s+Version="0\.1\.0-preview\.1"') {
+            if ($text -notmatch 'Permixa\.AspNetCore"\s+Version="0\.1\.0-preview\.2"') {
               throw "Permixa version pin missing/skew in $packagesProps"
+            }
+            if ($text -match '0\.1\.0-preview\.1') {
+              throw "Stale preview.1 pin in $packagesProps"
             }
           }
 
@@ -140,6 +188,7 @@ jobs:
             if (Test-Path $out) { Remove-Item -Recurse -Force $out }
             Write-Host "=== Generating $($v.Name) $($v.Args -join ' ') ==="
             & dotnet new permixa-app -n $v.Name -o $out @($v.Args)
+            Write-LocalRcNugetConfig $out $feed
             Assert-PackagePin (Join-Path $out 'Directory.Packages.props')
             Assert-NoProjectRefToPermixa $out
             Assert-NoForbidden $out
@@ -156,6 +205,12 @@ jobs:
             Push-Location $out
             try {
               dotnet restore
+              # Confirm Permixa packages resolved from local RC feed (not public nuget.org for preview.2 yet)
+              $assets = Get-ChildItem -Recurse -Filter 'project.assets.json' | Select-Object -First 1
+              $assetsText = Get-Content $assets.FullName -Raw
+              if ($assetsText -notmatch 'Permixa\.AspNetCore/0\.1\.0-preview\.2') {
+                throw "Generated project did not restore Permixa.AspNetCore 0.1.0-preview.2"
+              }
               dotnet build -c Release --no-restore
               dotnet test -c Release --no-build --verbosity minimal
             } finally {
@@ -169,6 +224,7 @@ jobs:
             if (Test-Path $out) { Remove-Item -Recurse -Force $out }
             Write-Host "=== Rename check $name ==="
             & dotnet new permixa-app -n $name -o $out
+            Write-LocalRcNugetConfig $out $feed
             Assert-NoForbidden $out
             Push-Location $out
             try {
@@ -179,4 +235,4 @@ jobs:
             }
           }
 
-          Write-Host 'Template validation OK'
+          Write-Host 'Template validation OK (local RC feed)'

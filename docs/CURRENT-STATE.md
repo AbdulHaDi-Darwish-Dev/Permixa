@@ -7,45 +7,40 @@
 
 | Item | Value |
 |------|--------|
-| Last completed phase | **Phase T3.1 — Templates-only publication workflow** |
-| Current phase / work | Await owner Trusted Publishing policy + explicit publish approval |
+| Last completed phase | **Phase R2.1 — Preview.2 release lockdown** |
+| Current phase / work | Await **owner publish approval** for `0.1.0-preview.2` |
 | Next approved implementation | **None** |
-| Framework packages | **Published** `0.1.0-preview.1` on nuget.org |
-| Templates | **Ready for publication** via `publish-nuget-templates.yml`; **not published yet** |
+| Framework packages on nuget.org | **Published** `0.1.0-preview.1` (until preview.2 ships) |
+| Release candidate | **`0.1.0-preview.2` ready for publication** (seven packages + icon); **not published yet** |
 | License | Apache-2.0 |
 | Canonical repository | https://github.com/AbdulHaDi-Darwish-Dev/Permixa |
 
 ## Latest verified baseline
 
-### Framework (historical I-5)
+### Framework (R2 fresh local Release run — 2026-09-17)
 
-Date: **2026-09-14** (after Phase I-5) — re-run before claiming new totals:
+| Suite | Passed | Failed | Skipped |
+|-------|--------|--------|---------|
+| Domain | 36 | 0 | 0 |
+| Application | 224 | 0 | 0 |
+| Infrastructure | 171 | 0 | 0 |
+| AspNetCore | 52 | 0 | 0 |
+| Caching.Redis | 17 | 0 | 0 |
+| Email.Resend | 5 | 0 | 0 |
+| Integration | 51 | 0 | 0 |
+| **Total** | **556** | **0** | **0** |
 
-```text
-Domain                36
-Application          224
-Infrastructure       171
-AspNetCore            52
-Caching.Redis         17
-Email.Resend           5
-Integration           51
-Total                556 / 556
-```
+### Templates (R2 local RC feed — `artifacts/r2-pack`, not nuget.org)
 
-### Templates (T3 — publication preparation)
+| Variant | Passed | Failed | Skipped |
+|---------|--------|--------|---------|
+| base (`ClinicSystem`) | 8 | 0 | 0 |
+| `--redis` | 9 | 0 | 0 |
+| `--resend` | 8 | 0 | 0 |
+| `--redis --resend` | 9 | 0 | 0 |
+| Rename (`HealthPortal`, `Acme.Identity.Api`) | build OK | — | — |
 
-Date: **2026-09-17** — metadata/README audited; local nupkg install + public nuget.org restore smoke; publish workflow recommendation prepared. **Not published.**
-
-Prior T2.2 Docker baseline (still the verified test matrix):
-
-| Variant | Domain | Application | Infrastructure | Integration | Total |
-|---------|-------:|------------:|---------------:|------------:|------:|
-| base | 2 | 1 | 1 | 4 | 8 |
-| `--redis` | 2 | 1 | 1 | 5 | 9 |
-| `--resend` | 2 | 1 | 1 | 4 | 8 |
-| `--redis --resend` | 2 | 1 | 1 | 5 | 9 |
-
-All **passed**, **0 skipped** (T2.2 / pre-T3 regression).
+Generated apps pin Permixa packages to `0.1.0-preview.2`. Public nuget.org restore for preview.2 is **not** claimed until publish succeeds.
 
 ## Product identity
 
@@ -53,15 +48,16 @@ All **passed**, **0 skipped** (T2.2 / pre-T3 regression).
 |------|--------|
 | Brand | Permixa |
 | Product | Permixa IAM |
+| Package icon | `assets/permixa-icon.png` (all seven packages) |
 | Solution | `Permixa.slnx` |
 | Primary NuGet package | `Permixa.AspNetCore` |
 | Optional providers | `Permixa.Caching.Redis`, `Permixa.Email.Resend` |
 | Templates package | `Permixa.Templates` (`permixa-app`) |
-| Preview version | `0.1.0-preview.1` |
+| Preview version | `0.1.0-preview.2` (RC) |
 
 ## Migrations (framework)
 
-Unchanged through T2:
+Unchanged through R2:
 
 1. `20260910144455_InitialCreate`
 2. `20260910160808_AddRefreshTokenFamilyId`
@@ -75,9 +71,10 @@ Unchanged through T2:
 
 | Topic | Classification |
 |-------|----------------|
-| Publish `Permixa.Templates` to nuget.org | **Ready** — run `publish-nuget-templates.yml` after Trusted Publishing policy |
-| Trusted Publishing for `publish-nuget-templates.yml` | **OWNER MUST VERIFY/ADD** on nuget.org (filename-bound; not proven by repo) |
-| Package icon | Non-blocking |
+| Publish `0.1.0-preview.2` (seven packages) | Owner approval required |
+| NuGet Trusted Publishing scope on `publish-nuget.yml` | **OWNER MUST VERIFY** covers all seven packages including `Permixa.Templates` (repo: `AbdulHaDi-Darwish-Dev/Permixa`) |
+| Preview publish train | **Lockstep only** — sole workflow `publish-nuget.yml` (Templates-only workflow removed) |
+| Package icon | **Resolved** (`assets/permixa-icon.png`) |
 | CLA / DCO | Before accepting substantial external PRs |
 | Unified `AddPermixa(...)` facade | Deferred |
 | Move `IEmailSender` to Application | Deferred |
