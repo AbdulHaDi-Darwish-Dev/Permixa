@@ -205,14 +205,23 @@ jobs:
             Push-Location $out
             try {
               dotnet restore
-              # Confirm Permixa packages resolved from local RC feed (not public nuget.org for preview.2 yet)
-              $assets = Get-ChildItem -Recurse -Filter 'project.assets.json' | Select-Object -First 1
-              $assetsText = Get-Content $assets.FullName -Raw
+              if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed for $($v.Name)" }
+              # Inspect Api assets (Domain has no Permixa PackageReference).
+              $assetsPath = Join-Path $out "src/$($v.Name).Api/obj/project.assets.json"
+              if (-not (Test-Path $assetsPath)) {
+                throw "Missing project.assets.json for $($v.Name).Api"
+              }
+              $assetsText = Get-Content $assetsPath -Raw
               if ($assetsText -notmatch 'Permixa\.AspNetCore/0\.1\.0-preview\.2') {
                 throw "Generated project did not restore Permixa.AspNetCore 0.1.0-preview.2"
               }
+              if ($assetsText -match '0\.1\.0-preview\.1') {
+                throw "Stale preview.1 resolved in $($v.Name).Api assets"
+              }
               dotnet build -c Release --no-restore
+              if ($LASTEXITCODE -ne 0) { throw "dotnet build failed for $($v.Name)" }
               dotnet test -c Release --no-build --verbosity minimal
+              if ($LASTEXITCODE -ne 0) { throw "dotnet test failed for $($v.Name)" }
             } finally {
               Pop-Location
             }
