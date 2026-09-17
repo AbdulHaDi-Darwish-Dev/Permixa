@@ -188,6 +188,8 @@ jobs:
             if (Test-Path $out) { Remove-Item -Recurse -Force $out }
             Write-Host "=== Generating $($v.Name) $($v.Args -join ' ') ==="
             & dotnet new permixa-app -n $v.Name -o $out @($v.Args)
+            if ($LASTEXITCODE -ne 0) { throw "dotnet new failed for $($v.Name)" }
+            $out = (Resolve-Path $out).Path
             Write-LocalRcNugetConfig $out $feed
             Assert-PackagePin (Join-Path $out 'Directory.Packages.props')
             Assert-NoProjectRefToPermixa $out
@@ -209,11 +211,13 @@ jobs:
               # Inspect Api assets (Domain has no Permixa PackageReference).
               $assetsPath = Join-Path $out "src/$($v.Name).Api/obj/project.assets.json"
               if (-not (Test-Path $assetsPath)) {
-                throw "Missing project.assets.json for $($v.Name).Api"
+                $found = Get-ChildItem -Path (Join-Path $out "src/$($v.Name).Api") -Recurse -Filter 'project.assets.json' -ErrorAction SilentlyContinue | Select-Object -First 1
+                if (-not $found) { throw "Missing project.assets.json for $($v.Name).Api under $out" }
+                $assetsPath = $found.FullName
               }
               $assetsText = Get-Content $assetsPath -Raw
               if ($assetsText -notmatch 'Permixa\.AspNetCore/0\.1\.0-preview\.2') {
-                throw "Generated project did not restore Permixa.AspNetCore 0.1.0-preview.2"
+                throw "Generated project did not restore Permixa.AspNetCore 0.1.0-preview.2 ($assetsPath)"
               }
               if ($assetsText -match '0\.1\.0-preview\.1') {
                 throw "Stale preview.1 resolved in $($v.Name).Api assets"
@@ -233,12 +237,16 @@ jobs:
             if (Test-Path $out) { Remove-Item -Recurse -Force $out }
             Write-Host "=== Rename check $name ==="
             & dotnet new permixa-app -n $name -o $out
+            if ($LASTEXITCODE -ne 0) { throw "dotnet new failed for $name" }
+            $out = (Resolve-Path $out).Path
             Write-LocalRcNugetConfig $out $feed
             Assert-NoForbidden $out
             Push-Location $out
             try {
               dotnet restore
+              if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed for $name" }
               dotnet build -c Release --no-restore
+              if ($LASTEXITCODE -ne 0) { throw "dotnet build failed for $name" }
             } finally {
               Pop-Location
             }
