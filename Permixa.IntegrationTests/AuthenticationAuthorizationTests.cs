@@ -280,7 +280,14 @@ public sealed class AuthenticationAuthorizationTests : IntegrationTestBase
 
         Assert.Equal(1, results.Count(r => r.IsSuccess));
         var loser = results.Single(r => r.IsFailure);
-        Assert.Equal(AuthenticationErrors.InvalidRefreshToken.Code, loser.Error!.Code);
+        // Race-dependent: loser may see consumed token as invalid OR as reuse (family containment).
+        Assert.Contains(
+            loser.Error!.Code,
+            new[]
+            {
+                AuthenticationErrors.InvalidRefreshToken.Code,
+                AuthenticationErrors.RefreshTokenReuseDetected.Code
+            });
 
         var winner = results.Single(r => r.IsSuccess);
         var winnerStillValid = await host.Client.PostAsJsonAsync("/refresh", new RefreshTokenRequest
