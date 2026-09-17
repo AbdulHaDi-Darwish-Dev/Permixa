@@ -6,7 +6,7 @@
 
 **Verified goal:** give consuming hosts Identity-backed authentication and Permixa-owned authorization, sessions, verification, MFA, and audit without each host reinventing those subsystems.
 
-**Future direction (vision from early project prompts; not all implemented):** NuGet distribution and .NET project templates.
+**Future direction (vision from early project prompts; not all implemented):** broader distribution polish beyond the template package.
 
 ## Stack
 
@@ -36,7 +36,8 @@ Labels: **Implemented** | **Approved but not implemented** | **Deferred** | **Op
 | MFA v1 (TOTP + recovery codes + login challenge) | Implemented |
 | IAM audit sink + SQL default + audit read | Implemented |
 | Production controllers / sample API | Deferred |
-| NuGet packaging / templates | Deferred (packaging paused) |
+| NuGet packaging | Implemented (`0.1.0-preview.1` published) |
+| .NET project templates | Implemented and **ready for publication** (`Permixa.Templates` / `permixa-app`); **not published** yet |
 | SMS / phone verification | Deferred |
 | SMS MFA / passkeys / remember device | Deferred |
 | External identity providers | Deferred |
@@ -46,8 +47,7 @@ Labels: **Implemented** | **Approved but not implemented** | **Deferred** | **Op
 
 ## What Permixa is not
 
-- Not a finished packaged NuGet product yet.
-- Not a full application host with production HTTP endpoints.
+- Not a full application host with production HTTP endpoints (use `Permixa.Templates` / `permixa-app` for a consumer starter).
 - Not a generic enterprise event store (audit is IAM-focused).
 - Not a replacement for ASP.NET Core Identity primitives.
 

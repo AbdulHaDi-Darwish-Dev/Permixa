@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore PermixaApp.sln
+
+      - name: Build (Release)
+        run: dotnet build PermixaApp.sln -c Release --no-restore
+
+      - name: Test Domain + Application
+        run: |
+          dotnet test tests/PermixaApp.Domain.Tests/PermixaApp.Domain.Tests.csproj -c Release --no-build --verbosity minimal
+          dotnet test tests/PermixaApp.Application.Tests/PermixaApp.Application.Tests.csproj -c Release --no-build --verbosity minimal
+
+      - name: Test Infrastructure + Integration (Docker / Testcontainers)
+        run: |
+          dotnet test tests/PermixaApp.Infrastructure.Tests/PermixaApp.Infrastructure.Tests.csproj -c Release --no-build --verbosity minimal
+          dotnet test tests/PermixaApp.IntegrationTests/PermixaApp.IntegrationTests.csproj -c Release --no-build --verbosity minimal

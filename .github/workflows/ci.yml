@@ -39,6 +39,7 @@ jobs:
           dotnet pack Permixa.AspNetCore/Permixa.AspNetCore.csproj -c Release -o artifacts/ci-pack --no-build
           dotnet pack Permixa.Caching.Redis/Permixa.Caching.Redis.csproj -c Release -o artifacts/ci-pack --no-build
           dotnet pack Permixa.Email.Resend/Permixa.Email.Resend.csproj -c Release -o artifacts/ci-pack --no-build
+          dotnet pack Permixa.Templates/Permixa.Templates.csproj -c Release -o artifacts/ci-pack
 
       - name: Inspect package graphs
         shell: pwsh
@@ -64,6 +65,118 @@ jobs:
           $resend = Get-Nuspec 'artifacts/ci-pack/Permixa.Email.Resend.0.1.0-preview.1.nupkg'
           if ($resend -notmatch 'id="Resend"') { throw 'Resend package missing Resend dependency' }
           if ($resend -match 'StackExchange.Redis') { throw 'Resend package must not depend on Redis' }
+          if (-not (Test-Path 'artifacts/ci-pack/Permixa.Templates.0.1.0-preview.1.nupkg')) {
+            throw 'Permixa.Templates nupkg missing'
+          }
           Write-Host 'Package graph inspection OK'
 
       # Intentionally no nuget push / release / tagging steps.
+
+  template-validation:
+    name: Template instantiate and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    needs: build-test-pack
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Pack templates
+        run: |
+          mkdir -p artifacts/templates
+          dotnet pack Permixa.Templates/Permixa.Templates.csproj -c Release -o artifacts/templates
+
+      - name: Install template package
+        run: |
+          dotnet new uninstall Permixa.Templates || true
+          dotnet new install artifacts/templates/Permixa.Templates.*.nupkg
+
+      - name: Validate all variants
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = 'artifacts/template-validation'
+          New-Item -ItemType Directory -Force -Path $root | Out-Null
+
+          function Assert-NoForbidden([string]$path) {
+            $files = Get-ChildItem -Recurse -File $path | Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+            $hits = @()
+            foreach ($f in $files) {
+              $hits += Select-String -Path $f.FullName -Pattern 'PermixaApp|Company\.PermixaApp' -ErrorAction SilentlyContinue
+            }
+            if ($hits.Count -gt 0) {
+              $hits | ForEach-Object { Write-Host $_.Path ':' $_.Line.Trim() }
+              throw "Forbidden leftover identifiers found under $path"
+            }
+          }
+
+          function Assert-PackagePin([string]$packagesProps) {
+            $text = Get-Content $packagesProps -Raw
+            if ($text -notmatch 'Permixa\.AspNetCore"\s+Version="0\.1\.0-preview\.1"') {
+              throw "Permixa version pin missing/skew in $packagesProps"
+            }
+          }
+
+          function Assert-NoProjectRefToPermixa([string]$dir) {
+            $hits = Select-String -Path (Get-ChildItem -Recurse -Filter '*.csproj' $dir).FullName -Pattern 'Permixa\.(Domain|Application|Infrastructure|AspNetCore).*csproj|ProjectReference.*Permixa'
+            if ($hits) { $hits | ForEach-Object { Write-Host $_ }; throw "Local Permixa ProjectReference found" }
+          }
+
+          $variants = @(
+            @{ Name = 'ClinicSystem'; Args = @() },
+            @{ Name = 'ClinicRedis'; Args = @('--redis') },
+            @{ Name = 'ClinicEmail'; Args = @('--resend') },
+            @{ Name = 'ClinicFull'; Args = @('--redis','--resend') }
+          )
+
+          foreach ($v in $variants) {
+            $out = Join-Path $root $v.Name
+            if (Test-Path $out) { Remove-Item -Recurse -Force $out }
+            Write-Host "=== Generating $($v.Name) $($v.Args -join ' ') ==="
+            & dotnet new permixa-app -n $v.Name -o $out @($v.Args)
+            Assert-PackagePin (Join-Path $out 'Directory.Packages.props')
+            Assert-NoProjectRefToPermixa $out
+            Assert-NoForbidden $out
+
+            $csproj = Join-Path $out "src/$($v.Name).Api/$($v.Name).Api.csproj"
+            $csprojText = Get-Content $csproj -Raw
+            $hasRedis = $csprojText -match 'Permixa\.Caching\.Redis'
+            $hasResend = $csprojText -match 'Permixa\.Email\.Resend'
+            $expectRedis = $v.Args -contains '--redis'
+            $expectResend = $v.Args -contains '--resend'
+            if ($hasRedis -ne $expectRedis) { throw "Redis PackageReference mismatch for $($v.Name)" }
+            if ($hasResend -ne $expectResend) { throw "Resend PackageReference mismatch for $($v.Name)" }
+
+            Push-Location $out
+            try {
+              dotnet restore
+              dotnet build -c Release --no-restore
+              dotnet test -c Release --no-build --verbosity minimal
+            } finally {
+              Pop-Location
+            }
+          }
+
+          # Rename-focused names
+          foreach ($name in @('HealthPortal','Acme.Identity.Api')) {
+            $out = Join-Path $root ("rename-" + ($name -replace '\.','-'))
+            if (Test-Path $out) { Remove-Item -Recurse -Force $out }
+            Write-Host "=== Rename check $name ==="
+            & dotnet new permixa-app -n $name -o $out
+            Assert-NoForbidden $out
+            Push-Location $out
+            try {
+              dotnet restore
+              dotnet build -c Release --no-restore
+            } finally {
+              Pop-Location
+            }
+          }
+
+          Write-Host 'Template validation OK'

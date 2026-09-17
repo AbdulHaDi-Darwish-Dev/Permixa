@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>PermixaApp.Api</RootNamespace>
+    <AssemblyName>PermixaApp.Api</AssemblyName>
+    <UserSecretsId>PermixaApp-dev-secrets</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PermixaApp.Application\PermixaApp.Application.csproj" />
+    <ProjectReference Include="..\PermixaApp.Infrastructure\PermixaApp.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Permixa.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <!--#if (redis)-->
+    <PackageReference Include="Permixa.Caching.Redis" />
+    <!--#endif-->
+    <!--#if (resend)-->
+    <PackageReference Include="Permixa.Email.Resend" />
+    <!--#endif-->
+  </ItemGroup>
+</Project>

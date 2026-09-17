@@ -6,19 +6,17 @@ Intentionally deferred or paused work. Not “forgotten” unless marked otherwi
 
 | Item | Status |
 |------|--------|
-| NuGet packaging | **Locally packable** (`0.1.0-preview.1`); **not publicly published** (ADR-0015) |
+| NuGet framework packages `0.1.0-preview.1` | **Published** on nuget.org (see GitHub Release `v0.1.0-preview.1`) |
+| .NET project templates (`Permixa.Templates` / `permixa-app`) | **Ready for publication** (Phase T3); **not published** to nuget.org yet |
 | Permanent product license | **Resolved** — Apache-2.0 for Permixa Core (ADR-0017) |
 | RepositoryUrl / SourceLink / package README | **Resolved** for preview (ADR-0017); icon deferred |
 | Public API trim / analyzer package | Not implemented |
-| .NET project templates | Deferred / future direction |
-| Sample / template host HTTP API | Deferred (libraries have no production controllers). Disposable consumers deleted after validation. |
-| Bootstrap Owner vs `RequireConfirmedEmail` | **Resolved** (ADR-0012) — new Owner `EmailConfirmed=true` |
-| Provider package split (Redis / Resend) | **Done** — ADR-0016 / Phase I-3 |
-| Move `IEmailSender` to Application | Deferred (kept in Infrastructure for Phase I-3) |
+| Move `IEmailSender` to Application | Deferred |
 | Unified `AddPermixa()` registration facade | Future DX recommendation only |
-| NuGet prefix reservation (`Permixa.*`) | Deferred until after first public publication |
+| NuGet prefix reservation (`Permixa.*`) | Deferred / verify after publishes |
 | CLA / DCO for external PRs | Deferred — CONTRIBUTING limits PR acceptance for now |
 | Package icon | Deferred (non-blocking for preview) |
+| Cursor `.cursor/rules` in generated apps | Deferred (v1 uses `AGENTS.md`) |
 
 ## Identity / MFA / verification
 
@@ -59,9 +57,8 @@ Intentionally deferred or paused work. Not “forgotten” unless marked otherwi
 
 These are **future recommendations** only:
 
-- Sample host exposing audit read + IAM admin HTTP
+- Sample host exposing audit read + IAM admin HTTP (beyond template reference endpoints)
 - Focused authentication audit with retention policy
-- Resume packaging after public API review + Permixa→Permixa branding migration
-- Optional convenience IAM rate-limit presets (separate from the generic config API)
+- Optional convenience IAM rate-limit presets
 
 Do not treat recommendations as project decisions.

@@ -12,8 +12,9 @@ It builds **on top of ASP.NET Core Identity** and adds permissions, overrides, r
 **Previous internal name:** Foundation (Phase I-1 / ADR-0014). Do not reintroduce Foundation product branding.
 
 Solution: `Permixa.slnx`  
-Primary NuGet package: `Permixa.AspNetCore` @ `0.1.0-preview.1`  
+Primary NuGet package: `Permixa.AspNetCore` @ `0.1.0-preview.1` (published on nuget.org)  
 Optional providers: `Permixa.Caching.Redis`, `Permixa.Email.Resend`  
+Templates (local): `Permixa.Templates` / `permixa-app` @ `0.1.0-preview.1` — **ready for publication; not published yet**  
 Canonical repo: https://github.com/AbdulHaDi-Darwish-Dev/Permixa  
 License: **Apache-2.0**
 
@@ -21,42 +22,22 @@ License: **Apache-2.0**
 
 | Item | State |
 |------|--------|
-| Last completed phase | **Phase I-5 — Public Preview Preparation & Final Dry Run** |
-| Current work | None open; await **explicit publish approval** |
-| Next approved implementation | **None** — NuGet publish only after owner approval |
-| Packaging | **Public-preview ready pending explicit publish approval** |
+| Last completed phase | **Phase T3.1 — Templates-only publication workflow** |
+| Current work | Await owner Trusted Publishing policy for `publish-nuget-templates.yml` + publish approval |
+| Next approved implementation | **None** until explicitly directed |
+| Framework packages | Published `0.1.0-preview.1` |
+| Templates | Workflow ready; **not published** — do not nuget push without approval |
 | Production HTTP controllers | **None** in library projects |
-| Sample / disposable consumers | Deleted after validation (not product) |
 
 ## Latest Verified Baseline
 
-Verified in-repo on **2026-09-14** (after Phase I-5):
+Framework tests (I-5 era, re-run if claiming new totals):
 
 ```text
-Domain                36
-Application          224
-Infrastructure       171
-AspNetCore            52
-Caching.Redis         17
-Email.Resend           5
-Integration           51
-Total                556 / 556
-
-Build: 0 errors, 0 warnings
-Skipped: 0
+Total                556 / 556 (historical I-5)
 ```
 
-## Completed Phases (summary)
-
-Early numbered phases → **A**–**H**; **I-0**–**I-5** (Rate Limiting → branding → packaging → providers → readiness → public preview prep).
-
-See [CHANGELOG-PHASES.md](CHANGELOG-PHASES.md) and [phases/](phases/).
-
-## Current / Next Approved Work
-
-- **Now:** Preview preparation complete (ADR-0017). **Do not** `nuget push` / tag / GitHub Release without explicit approval.
-- **Next:** Owner-approved publish of `0.1.0-preview.1` to NuGet.org (and optional prefix reservation after).
-- Push local `main` to GitHub when owner directs.
+Template T2.2 + pre-T3 Program cleanup + **T3 publication prep** (metadata/README/nupkg smoke). Four variants previously **pass** (8/9/8/9). Templates **not published**.
 
 ## Critical Architecture Decisions (selected)
 
@@ -67,6 +48,7 @@ See [CHANGELOG-PHASES.md](CHANGELOG-PHASES.md) and [phases/](phases/).
 | Redis = disposable authz cache; SQL = source of truth | Implemented |
 | Optional Redis/Resend provider packages | ADR-0016 |
 | Apache-2.0 core; canonical GitHub repo; SourceLink; validation CI | ADR-0017 |
+| Consumer template: CA host + two DbContexts + `--redis`/`--resend` | Phase T1/T2 |
 
 ## Permanent Agent Rules
 
@@ -78,7 +60,7 @@ See [CHANGELOG-PHASES.md](CHANGELOG-PHASES.md) and [phases/](phases/).
 
 ## Deferred Scope
 
-See [DEFERRED-SCOPE.md](DEFERRED-SCOPE.md). Highlights: package icon, `Permixa.*` prefix reservation, CLA/DCO, templates, SMS/passkeys, `AddPermixa()` facade.
+See [DEFERRED-SCOPE.md](DEFERRED-SCOPE.md).
 
 ## Required Reading
 
@@ -90,4 +72,4 @@ See [DEFERRED-SCOPE.md](DEFERRED-SCOPE.md). Highlights: package icon, `Permixa.*
 
 ## Last Documentation Update
 
-**2026-09-14** — Phase I-5: public preview preparation complete; not published.
+**2026-09-17** — Phase T3.1: added `publish-nuget-templates.yml` (templates-only OIDC push). Templates still not published.

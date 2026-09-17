@@ -140,6 +140,17 @@ dotnet add package Permixa.Email.Resend --prerelease
 
 > You normally do **not** need to reference `Permixa.Domain`, `Permixa.Application`, or `Permixa.Infrastructure` directly — they arrive transitively with `Permixa.AspNetCore`.
 
+### Optional application template
+
+Prefer a full Clean Architecture starter instead of wiring packages by hand:
+
+```bash
+dotnet new install Permixa.Templates --version 0.1.0-preview.1
+dotnet new permixa-app -n MyApp
+```
+
+Templates are **optional**. Existing projects can keep using `Permixa.AspNetCore` directly. See [Permixa.Templates/README.md](Permixa.Templates/README.md).
+
 ---
 
 ## Quick start

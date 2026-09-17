@@ -46,10 +46,16 @@ Early 9.5 draft labeled MFA as “E” and Phone/SMS as “F”. **Actual execut
 | I-2 | Local NuGet packaging + package consumer | `0.1.0-preview.1` local feed; PackageReference consumer validated + deleted (ADR-0015); **not publicly published** |
 | I-3 | Optional Redis / Resend provider packages | `Permixa.Caching.Redis` + `Permixa.Email.Resend`; core no longer pulls those SDKs (ADR-0016) |
 | I-4 | Public preview readiness assessment | Assessment only — blockers: license, repo, README, SourceLink, CI |
-| I-5 | Public preview preparation + dry-run | Apache-2.0, canonical GitHub repo metadata, SourceLink, public docs, validation CI; **not published** (ADR-0017) |
+| I-5 | Public preview preparation + dry-run | Apache-2.0, canonical GitHub repo metadata, SourceLink, public docs, validation CI; later published as `0.1.0-preview.1` |
+| T1 | Permixa .NET template design | Full Clean Architecture consumer template design approved |
+| T2 | Permixa.Templates local implementation | `permixa-app` template packable locally; four variants validated for generate/build; **not published** |
+| T2.1 | Template verification & security audit | Docker/Testcontainers: all four variants green; AppPermissionSeeder audit **B**; JSON/`AddPermixaVerification` host fixes; **not published** |
+| T2.2 | Template final hardening | Seeder fail-fast AuthorizationState; AppSeed default false; `safe_namespace` for hyphenated `-n`; regression green; **not published** |
+| T3 | Templates publication preparation | Metadata/README/nupkg consumer smoke; templates-only publish strategy recommended; **not published** |
+| T3.1 | Templates-only publication workflow | `publish-nuget-templates.yml` (OIDC, Templates only); **not published** |
 
 Phone/SMS (once floated as “Phase F” in inspection notes) remains **deferred**.
 
-## Latest verified baseline after Phase I-5
+## Latest verified baseline
 
-See [CURRENT-STATE.md](CURRENT-STATE.md).
+See [CURRENT-STATE.md](CURRENT-STATE.md). Framework package baseline remains the I-5 suite unless re-verified. Template T2.1 verified with Docker (see CURRENT-STATE tables).

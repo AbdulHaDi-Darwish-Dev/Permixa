@@ -1,0 +1,124 @@
+name: Publish NuGet Templates
+
+# Manual-only publication of Permixa.Templates via NuGet.org Trusted Publishing (OIDC).
+#
+# OWNER MUST VERIFY/ADD TRUSTED PUBLISHING POLICY FOR publish-nuget-templates.yml
+# NuGet.org Trusted Publishing is typically bound to a specific repository + workflow
+# filename. The existing policy for publish-nuget.yml does NOT automatically authorize
+# this file even if a package glob such as Permixa.* matches.
+#
+# Expected NuGet.org policy association:
+#   repository: AbdulHaDi-Darwish-Dev/Permixa
+#   workflow:   publish-nuget-templates.yml
+#   package:    Permixa.Templates (and/or Permixa.* if configured)
+#
+# This workflow packs and pushes ONLY Permixa.Templates.
+# It never packs or pushes the six framework packages
+# (Domain/Application/Infrastructure/AspNetCore/Caching.Redis/Email.Resend).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish-templates:
+    name: Pack and publish Permixa.Templates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Resolve package version from Directory.Build.props
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(grep -oP '(?<=<PackageVersion>)[^<]+' Directory.Build.props | head -n1)"
+          if [[ -z "$VERSION" ]]; then
+            echo "Could not read PackageVersion from Directory.Build.props" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved PackageVersion=$VERSION"
+
+      - name: Pack Permixa.Templates (Release)
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/publish-templates
+          # Template package packs from project content; version comes from Directory.Build.props.
+          # Full template instantiate/test matrix lives in CI (ci.yml template-validation).
+          # Publication requires a successful pack of the checked-out commit.
+          dotnet pack Permixa.Templates/Permixa.Templates.csproj \
+            -c Release \
+            -o artifacts/publish-templates
+
+      - name: Assert exact Templates nupkg
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+          EXPECTED="artifacts/publish-templates/Permixa.Templates.${VERSION}.nupkg"
+          if [[ ! -f "$EXPECTED" ]]; then
+            echo "Missing expected package: $EXPECTED" >&2
+            ls -la artifacts/publish-templates || true
+            exit 1
+          fi
+          # Fail if any other .nupkg slipped into the publish folder (framework packages, etc.).
+          mapfile -t ALL_NUPKGS < <(find artifacts/publish-templates -maxdepth 1 -type f -name '*.nupkg' | sort)
+          if [[ "${#ALL_NUPKGS[@]}" -ne 1 ]]; then
+            echo "Expected exactly one .nupkg in artifacts/publish-templates; found:" >&2
+            printf '%s\n' "${ALL_NUPKGS[@]}" >&2
+            exit 1
+          fi
+          if [[ "${ALL_NUPKGS[0]}" != "$EXPECTED" ]]; then
+            echo "Unexpected package path: ${ALL_NUPKGS[0]} (expected $EXPECTED)" >&2
+            exit 1
+          fi
+          # Hard guard: never allow framework package ids in this folder.
+          if find artifacts/publish-templates -maxdepth 1 -type f \( \
+              -name 'Permixa.Domain.*.nupkg' -o \
+              -name 'Permixa.Application.*.nupkg' -o \
+              -name 'Permixa.Infrastructure.*.nupkg' -o \
+              -name 'Permixa.AspNetCore.*.nupkg' -o \
+              -name 'Permixa.Caching.Redis.*.nupkg' -o \
+              -name 'Permixa.Email.Resend.*.nupkg' \
+            \) | grep -q .; then
+            echo "Framework packages must not appear in templates publish folder" >&2
+            exit 1
+          fi
+          echo "OK: $EXPECTED"
+
+      - name: NuGet login (OIDC → temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          # nuget.org profile username (not email). Public identifier, not a credential.
+          user: abdulhadi
+
+      - name: Publish Permixa.Templates only
+        env:
+          NUGET_AUTH_TOKEN: ${{ steps.login.outputs.NUGET_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+          PKG="artifacts/publish-templates/Permixa.Templates.${VERSION}.nupkg"
+          SOURCE="https://api.nuget.org/v3/index.json"
+          # Exact path only — no wildcards, skip-duplicate forbidden, fail-fast.
+          if [[ ! -f "$PKG" ]]; then
+            echo "Missing package file: $PKG" >&2
+            exit 1
+          fi
+          echo "Publishing $PKG"
+          dotnet nuget push "$PKG" \
+            --api-key "$NUGET_AUTH_TOKEN" \
+            --source "$SOURCE"

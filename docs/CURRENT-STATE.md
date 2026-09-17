@@ -7,16 +7,19 @@
 
 | Item | Value |
 |------|--------|
-| Last completed phase | **Phase I-5 — Public Preview Preparation & Final Dry Run** |
-| Current phase / work | None — await **explicit NuGet publish approval** |
+| Last completed phase | **Phase T3.1 — Templates-only publication workflow** |
+| Current phase / work | Await owner Trusted Publishing policy + explicit publish approval |
 | Next approved implementation | **None** |
-| Packaging | **Public-preview ready pending explicit publish approval** |
+| Framework packages | **Published** `0.1.0-preview.1` on nuget.org |
+| Templates | **Ready for publication** via `publish-nuget-templates.yml`; **not published yet** |
 | License | Apache-2.0 |
 | Canonical repository | https://github.com/AbdulHaDi-Darwish-Dev/Permixa |
 
 ## Latest verified baseline
 
-Date: **2026-09-14** (after Phase I-5)
+### Framework (historical I-5)
+
+Date: **2026-09-14** (after Phase I-5) — re-run before claiming new totals:
 
 ```text
 Domain                36
@@ -27,10 +30,22 @@ Caching.Redis         17
 Email.Resend           5
 Integration           51
 Total                556 / 556
-
-Build: 0 errors, 0 warnings
-Skipped: 0
 ```
+
+### Templates (T3 — publication preparation)
+
+Date: **2026-09-17** — metadata/README audited; local nupkg install + public nuget.org restore smoke; publish workflow recommendation prepared. **Not published.**
+
+Prior T2.2 Docker baseline (still the verified test matrix):
+
+| Variant | Domain | Application | Infrastructure | Integration | Total |
+|---------|-------:|------------:|---------------:|------------:|------:|
+| base | 2 | 1 | 1 | 4 | 8 |
+| `--redis` | 2 | 1 | 1 | 5 | 9 |
+| `--resend` | 2 | 1 | 1 | 4 | 8 |
+| `--redis --resend` | 2 | 1 | 1 | 5 | 9 |
+
+All **passed**, **0 skipped** (T2.2 / pre-T3 regression).
 
 ## Product identity
 
@@ -41,23 +56,12 @@ Skipped: 0
 | Solution | `Permixa.slnx` |
 | Primary NuGet package | `Permixa.AspNetCore` |
 | Optional providers | `Permixa.Caching.Redis`, `Permixa.Email.Resend` |
+| Templates package | `Permixa.Templates` (`permixa-app`) |
 | Preview version | `0.1.0-preview.1` |
-| Local feed | `artifacts/local-feed/` (gitignored) |
 
-## Packaging status
+## Migrations (framework)
 
-| Item | Status |
-|------|--------|
-| Local `dotnet pack` (6 packages) | Verified (I-5 dry-run) |
-| License / RepositoryUrl / SourceLink / READMEs | Configured (ADR-0017) |
-| Validation CI workflow | Present (no publish) |
-| Package icon | Deferred |
-| Public nuget.org | **Not published** |
-| Classification | **Public-preview ready pending explicit publish approval** |
-
-## Migrations
-
-Unchanged through I-5 (no schema change in this phase):
+Unchanged through T2:
 
 1. `20260910144455_InitialCreate`
 2. `20260910160808_AddRefreshTokenFamilyId`
@@ -71,8 +75,8 @@ Unchanged through I-5 (no schema change in this phase):
 
 | Topic | Classification |
 |-------|----------------|
-| NuGet.org publish of `0.1.0-preview.1` | Owner approval required |
-| `Permixa.*` prefix reservation | After first publish |
+| Publish `Permixa.Templates` to nuget.org | **Ready** — run `publish-nuget-templates.yml` after Trusted Publishing policy |
+| Trusted Publishing for `publish-nuget-templates.yml` | **OWNER MUST VERIFY/ADD** on nuget.org (filename-bound; not proven by repo) |
 | Package icon | Non-blocking |
 | CLA / DCO | Before accepting substantial external PRs |
 | Unified `AddPermixa(...)` facade | Deferred |

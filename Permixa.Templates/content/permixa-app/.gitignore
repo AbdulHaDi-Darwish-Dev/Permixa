@@ -1,0 +1,39 @@
+## .NET
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## IDE
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+
+## Test / coverage
+[Tt]est[Rr]esult*/
+*.trx
+coverage*
+
+## Secrets / local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Build artifacts
+artifacts/

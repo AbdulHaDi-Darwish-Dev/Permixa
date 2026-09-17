@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>PermixaApp.Domain</RootNamespace>
+    <AssemblyName>PermixaApp.Domain</AssemblyName>
+  </PropertyGroup>
+</Project>

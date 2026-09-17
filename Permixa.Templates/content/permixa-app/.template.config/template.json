@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Abdulhadi Darwish",
+  "classifications": [
+    "Web",
+    "ASP.NET",
+    "WebAPI",
+    "Clean Architecture",
+    "IAM",
+    "Permixa"
+  ],
+  "name": "Permixa ASP.NET Core Application",
+  "description": "Professional Clean Architecture ASP.NET Core starter that consumes Permixa IAM from NuGet.",
+  "groupIdentity": "Permixa.Templates.App",
+  "identity": "Permixa.Templates.PermixaApp",
+  "shortName": "permixa-app",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "PermixaApp",
+  "preferNameDirectory": true,
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!resend)",
+          "exclude": [
+            "src/PermixaApp.Api/Endpoints/EmailConfirmationEndpoints.cs",
+            "tests/PermixaApp.IntegrationTests/ResendConfirmationFlowTests.cs"
+          ]
+        },
+        {
+          "condition": "(!redis)",
+          "exclude": [
+            "tests/PermixaApp.IntegrationTests/RedisAuthorizationTests.cs"
+          ]
+        },
+        {
+          "condition": "(resend)",
+          "exclude": [
+            "src/PermixaApp.Api/Hosting/UnconfiguredVerificationDispatcher.cs"
+          ]
+        }
+      ]
+    }
+  ],
+  "symbols": {
+    "safeName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "safe_namespace",
+      "replaces": "PermixaApp",
+      "fileRename": "PermixaApp",
+      "description": "C# / project identifier derived from -n (hyphens → underscores; dots preserved)."
+    },
+    "redis": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "displayName": "Enable Redis authorization cache",
+      "description": "Adds Permixa.Caching.Redis, DI registration, and Redis in Docker Compose."
+    },
+    "resend": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "displayName": "Enable Resend email delivery",
+      "description": "Adds Permixa.Email.Resend, verification pipeline, and email confirmation endpoints."
+    }
+  },
+  "primaryOutputs": [
+    {
+      "path": "PermixaApp.sln"
+    },
+    {
+      "path": "src/PermixaApp.Api/PermixaApp.Api.csproj"
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Restore NuGet packages",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

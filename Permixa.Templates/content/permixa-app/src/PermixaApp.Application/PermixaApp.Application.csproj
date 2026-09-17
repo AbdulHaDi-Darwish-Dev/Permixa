@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>PermixaApp.Application</RootNamespace>
+    <AssemblyName>PermixaApp.Application</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PermixaApp.Domain\PermixaApp.Domain.csproj" />
+  </ItemGroup>
+</Project>
