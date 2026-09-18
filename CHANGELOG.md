@@ -8,13 +8,13 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/). Versi
 
 ## [0.1.0-preview.2] — 2026-09-17
 
-Unified preview release candidate (not published until owner approval).
+Unified preview release — **published** on nuget.org (source `af9de3c`).
 
 ### Added
 
 - `Permixa.Templates` / `permixa-app` — optional Clean Architecture ASP.NET Core application starter
-  - Domain / Application / Infrastructure / Api + tests
-  - Generated docs, Docker Compose (SQL Server; Redis when selected), CI workflow
+  - Domain / Application / Infrastructure / Api + four test projects
+  - Generated docs, `AGENTS.md`, Docker Compose (SQL Server; Redis when selected), CI workflow
   - Template options: `--redis`, `--resend`
   - Development migrate / bootstrap / optional app permission seed
 - Shared NuGet package icon (`assets/permixa-icon.png`) on all seven packages
@@ -27,8 +27,9 @@ Unified preview release candidate (not published until owner approval).
 
 ### Notes
 
-- No IAM/RBAC/MFA/schema behavioral changes vs `0.1.0-preview.1` framework packages in this release train
+- No IAM/RBAC/MFA/schema behavioral changes vs `0.1.0-preview.1` framework packages
 - Templates-only publish workflow removed during preview to prevent version skew
+- Test-only hardening included in the published commit (concurrent refresh assertion race)
 
 ## [0.1.0-preview.1] — 2026-09-14
 

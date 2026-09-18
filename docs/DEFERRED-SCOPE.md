@@ -7,9 +7,9 @@ Intentionally deferred or paused work. Not “forgotten” unless marked otherwi
 | Item | Status |
 |------|--------|
 | NuGet framework packages `0.1.0-preview.1` | **Published** on nuget.org (see GitHub Release `v0.1.0-preview.1`) |
-| Unified `0.1.0-preview.2` (seven packages + icon) | **Release candidate** — ready for owner publish approval; **not published** |
+| Unified `0.1.0-preview.2` (seven packages + icon) | **Published** on nuget.org (see GitHub Release `v0.1.0-preview.2`) |
 | Preview publish train | **Lockstep** — only `.github/workflows/publish-nuget.yml` (Templates-only workflow removed in R2.1) |
-| .NET project templates (`Permixa.Templates` / `permixa-app`) | Included in preview.2 RC; **not published** yet |
+| .NET project templates (`Permixa.Templates` / `permixa-app`) | **Published** with `0.1.0-preview.2` |
 | Package icon | **Resolved** for preview.2 — `assets/permixa-icon.png` |
 | Permanent product license | **Resolved** — Apache-2.0 for Permixa Core (ADR-0017) |
 | RepositoryUrl / SourceLink / package README | **Resolved** for preview (ADR-0017); icon deferred |

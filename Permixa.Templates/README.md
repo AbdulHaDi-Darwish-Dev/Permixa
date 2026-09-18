@@ -1,6 +1,6 @@
 # Permixa.Templates
 
-**Preview (`0.1.0-preview.2` release candidate)** — optional .NET project templates for applications that consume **Permixa** IAM from NuGet.
+**Preview (`0.1.0-preview.2` published)** — optional .NET project templates for applications that consume **Permixa** IAM from NuGet.
 
 | Package | Role |
 |---------|------|
@@ -24,7 +24,7 @@ dotnet new permixa-app -n ClinicEmail --resend
 dotnet new permixa-app -n ClinicFull --redis --resend
 ```
 
-Requires **.NET 8**. Generated apps restore Permixa packages from **nuget.org** (after this version is published).
+Requires **.NET 8**. Generated apps restore Permixa packages from **nuget.org**.
 
 ### Options
 

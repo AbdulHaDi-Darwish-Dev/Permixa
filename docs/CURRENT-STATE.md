@@ -7,17 +7,18 @@
 
 | Item | Value |
 |------|--------|
-| Last completed phase | **Phase R2.1 — Preview.2 release lockdown** |
-| Current phase / work | Await **owner publish approval** for `0.1.0-preview.2` |
+| Last completed phase | **Phase R3 — Preview.2 post-release finalization** |
+| Current phase / work | **None** — await next owner-approved work |
 | Next approved implementation | **None** |
-| Framework packages on nuget.org | **Published** `0.1.0-preview.1` (until preview.2 ships) |
-| Release candidate | **`0.1.0-preview.2` ready for publication** (seven packages + icon); **not published yet** |
+| nuget.org | **Published** `0.1.0-preview.2` (all seven packages) |
+| GitHub Release | `v0.1.0-preview.2` (pre-release) |
 | License | Apache-2.0 |
 | Canonical repository | https://github.com/AbdulHaDi-Darwish-Dev/Permixa |
+| Published source commit | `af9de3cf77dcc83333bb4252b0295a7da774809e` |
 
 ## Latest verified baseline
 
-### Framework (R2 fresh local Release run — 2026-09-17)
+### Framework (R2 fresh local Release run — 2026-09-17; re-confirmed green on publish CI)
 
 | Suite | Passed | Failed | Skipped |
 |-------|--------|--------|---------|
@@ -30,17 +31,14 @@
 | Integration | 51 | 0 | 0 |
 | **Total** | **556** | **0** | **0** |
 
-### Templates (R2 local RC feed — `artifacts/r2-pack`, not nuget.org)
+### Templates
 
-| Variant | Passed | Failed | Skipped |
-|---------|--------|--------|---------|
-| base (`ClinicSystem`) | 8 | 0 | 0 |
-| `--redis` | 9 | 0 | 0 |
-| `--resend` | 8 | 0 | 0 |
-| `--redis --resend` | 9 | 0 | 0 |
-| Rename (`HealthPortal`, `Acme.Identity.Api`) | build OK | — | — |
+| Check | Result |
+|-------|--------|
+| Local RC matrix (R2) | base 8 / `--redis` 9 / `--resend` 8 / full 9 |
+| Public consumer smoke | `dotnet new install Permixa.Templates@0.1.0-preview.2` → generate → **build OK** |
 
-Generated apps pin Permixa packages to `0.1.0-preview.2`. Public nuget.org restore for preview.2 is **not** claimed until publish succeeds.
+Generated apps pin Permixa packages to `0.1.0-preview.2` from nuget.org.
 
 ## Product identity
 
@@ -53,11 +51,11 @@ Generated apps pin Permixa packages to `0.1.0-preview.2`. Public nuget.org resto
 | Primary NuGet package | `Permixa.AspNetCore` |
 | Optional providers | `Permixa.Caching.Redis`, `Permixa.Email.Resend` |
 | Templates package | `Permixa.Templates` (`permixa-app`) |
-| Preview version | `0.1.0-preview.2` (RC) |
+| Preview version | `0.1.0-preview.2` (**published**) |
 
 ## Migrations (framework)
 
-Unchanged through R2:
+Unchanged through preview.2:
 
 1. `20260910144455_InitialCreate`
 2. `20260910160808_AddRefreshTokenFamilyId`
@@ -71,9 +69,7 @@ Unchanged through R2:
 
 | Topic | Classification |
 |-------|----------------|
-| Publish `0.1.0-preview.2` (seven packages) | Owner approval required |
-| NuGet Trusted Publishing scope on `publish-nuget.yml` | **OWNER MUST VERIFY** covers all seven packages including `Permixa.Templates` (repo: `AbdulHaDi-Darwish-Dev/Permixa`) |
-| Preview publish train | **Lockstep only** — sole workflow `publish-nuget.yml` (Templates-only workflow removed) |
+| Preview publish train | **Lockstep only** — sole workflow `publish-nuget.yml` |
 | Package icon | **Resolved** (`assets/permixa-icon.png`) |
 | CLA / DCO | Before accepting substantial external PRs |
 | Unified `AddPermixa(...)` facade | Deferred |

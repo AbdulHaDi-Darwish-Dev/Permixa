@@ -53,11 +53,12 @@ Early 9.5 draft labeled MFA as “E” and Phone/SMS as “F”. **Actual execut
 | T2.2 | Template final hardening | Seeder fail-fast AuthorizationState; AppSeed default false; `safe_namespace` for hyphenated `-n`; regression green; **not published** |
 | T3 | Templates publication preparation | Metadata/README/nupkg consumer smoke; **not published** |
 | T3.1 | Templates-only publication workflow | Added then **removed in R2.1** — preview uses lockstep `publish-nuget.yml` only |
-| R2 | Unified preview.2 branding + release prep | Version `0.1.0-preview.2`, shared icon, Templates in main publish workflow; **RC not published** |
-| R2.1 | Preview.2 release lockdown | Removed `publish-nuget-templates.yml`; lockstep-only publish train; **not published** |
+| R2 | Unified preview.2 branding + release prep | Version `0.1.0-preview.2`, shared icon, Templates in main publish workflow |
+| R2.1 | Preview.2 release lockdown | Removed `publish-nuget-templates.yml`; lockstep-only publish train |
+| R3 | Preview.2 post-release finalization | Published nuget.org + tag `v0.1.0-preview.2` + GitHub pre-release; docs marked published |
 
 Phone/SMS (once floated as “Phase F” in inspection notes) remains **deferred**.
 
 ## Latest verified baseline
 
-See [CURRENT-STATE.md](CURRENT-STATE.md). R2 re-verified framework **556/556** and template Docker/Testcontainers matrix against local `0.1.0-preview.2` packs.
+See [CURRENT-STATE.md](CURRENT-STATE.md). Preview.2 published from `af9de3c` (framework **556/556**; public template smoke build OK).

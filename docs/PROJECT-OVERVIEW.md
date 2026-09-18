@@ -36,9 +36,9 @@ Labels: **Implemented** | **Approved but not implemented** | **Deferred** | **Op
 | MFA v1 (TOTP + recovery codes + login challenge) | Implemented |
 | IAM audit sink + SQL default + audit read | Implemented |
 | Production controllers / sample API | Deferred |
-| NuGet packaging | Implemented (`0.1.0-preview.1` published; `0.1.0-preview.2` RC ready) |
-| .NET project templates | Implemented (`Permixa.Templates`); included in `0.1.0-preview.2` RC; **not published** yet |
-| Shared NuGet package icon | Implemented (`assets/permixa-icon.png`) for preview.2 RC |
+| NuGet packaging | Implemented (`0.1.0-preview.2` published; seven lockstep packages) |
+| .NET project templates | Implemented (`Permixa.Templates` / `permixa-app`); **published** with `0.1.0-preview.2` |
+| Shared NuGet package icon | Implemented (`assets/permixa-icon.png`) on all seven packages |
 | SMS / phone verification | Deferred |
 | SMS MFA / passkeys / remember device | Deferred |
 | External identity providers | Deferred |

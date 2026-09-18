@@ -4,8 +4,8 @@
 
 Permixa is a reusable security and Identity & Access Management framework for ASP.NET Core that provides authentication, authorization, fine-grained RBAC, JWT and refresh-token sessions, verification, MFA, authorization caching, Rate Limiting, account security, and IAM auditing — without rebuilding the same infrastructure for every application.
 
-> **Status: Preview (`0.1.0-preview.2` release candidate)**  
-> Permixa is currently **pre-1.0**. Public APIs and package structure may evolve before the first stable release. Prefer the preview for evaluation and early integration; pin versions and review release notes before upgrading. Framework packages `0.1.0-preview.1` remain on nuget.org until `0.1.0-preview.2` is published.
+> **Status: Preview (`0.1.0-preview.2` published)**  
+> Permixa is currently **pre-1.0**. Public APIs and package structure may evolve before the first stable release. Prefer the preview for evaluation and early integration; pin versions and review release notes before upgrading.
 
 [![CI](https://github.com/AbdulHaDi-Darwish-Dev/Permixa/actions/workflows/ci.yml/badge.svg)](https://github.com/AbdulHaDi-Darwish-Dev/Permixa/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
